@@ -43,7 +43,7 @@ class _AddEditObservationPageState extends ConsumerState<AddEditObservationPage>
         final plants = ref.read(plantProvider).plants;
         setState(() {
           _selectedRelatedPlant = plants.firstWhereOrNull(
-            (plant) => plant.id == widget.observation!.relatedField,
+            (plant) => plant.id == widget.observation!.relatedPlant,
           );
         });
       });
@@ -125,7 +125,7 @@ class _AddEditObservationPageState extends ConsumerState<AddEditObservationPage>
       }
 
       final data = {
-        'related_field': _selectedRelatedPlant!.id,
+        'related_plant_id': _selectedRelatedPlant!.id,
         'date': dateController.text,
         'time': '${timeController.text}:00',
         'location': locationController.text,

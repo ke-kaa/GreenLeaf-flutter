@@ -20,7 +20,7 @@ void main() {
       expect(observation.location, equals('Test Location'));
       expect(observation.note, equals('Test Note'));
       expect(observation.observationImage, isNull);
-      expect(observation.relatedField, isNull);
+      expect(observation.relatedPlant, isNull);
       expect(observation.createdBy, isNull);
       expect(observation.syncStatus, equals(SyncStatus.synced));
     });
@@ -29,7 +29,7 @@ void main() {
       final observation = Observation(
         id: 1,
         observationImage: 'test_image.jpg',
-        relatedField: 123,
+        relatedPlant: 123,
         time: const TimeOfDay(hour: 14, minute: 30),
         date: DateTime(2024, 3, 15),
         location: 'Test Location',
@@ -39,7 +39,7 @@ void main() {
       );
 
       expect(observation.observationImage, equals('test_image.jpg'));
-      expect(observation.relatedField, equals(123));
+      expect(observation.relatedPlant, equals(123));
       expect(observation.createdBy, equals('test_user'));
       expect(observation.syncStatus, equals(SyncStatus.pending_create));
     });
@@ -69,7 +69,7 @@ void main() {
       final json = {
         'id': 1,
         'observation_image': 'test_image.jpg',
-        'related_field': 123,
+        'related_plant': 123,
         'time': '14:30:00',
         'date': '2024-03-15',
         'location': 'Test Location',
@@ -81,7 +81,7 @@ void main() {
 
       expect(observation.id, equals(1));
       expect(observation.observationImage, equals('test_image.jpg'));
-      expect(observation.relatedField, equals(123));
+      expect(observation.relatedPlant, equals(123));
       expect(observation.time, equals(const TimeOfDay(hour: 14, minute: 30)));
       expect(observation.date, equals(DateTime(2024, 3, 15)));
       expect(observation.location, equals('Test Location'));
@@ -112,7 +112,7 @@ void main() {
       expect(observationWithEmptyString.observationImage, isNull);
     });
 
-    test('fromJson should handle different related_field types', () {
+    test('fromJson should handle different related_plant types', () {
       final json = {
         'id': 1,
         'time': '14:30:00',
@@ -124,33 +124,33 @@ void main() {
       // Test with integer
       final jsonWithInt = {
         ...json,
-        'related_field': 123,
+        'related_plant': 123,
       };
       final observationWithInt = Observation.fromJson(jsonWithInt);
-      expect(observationWithInt.relatedField, equals(123));
+      expect(observationWithInt.relatedPlant, equals(123));
 
       // Test with string
       final jsonWithString = {
         ...json,
-        'related_field': '456',
+        'related_plant': '456',
       };
       final observationWithString = Observation.fromJson(jsonWithString);
-      expect(observationWithString.relatedField, equals(456));
+      expect(observationWithString.relatedPlant, equals(456));
 
       // Test with double
       final jsonWithDouble = {
         ...json,
-        'related_field': 789.0,
+        'related_plant': 789.0,
       };
       final observationWithDouble = Observation.fromJson(jsonWithDouble);
-      expect(observationWithDouble.relatedField, equals(789));
+      expect(observationWithDouble.relatedPlant, equals(789));
     });
 
     test('toJson should convert Observation instance to JSON', () {
       final observation = Observation(
         id: 1,
         observationImage: 'test_image.jpg',
-        relatedField: 123,
+        relatedPlant: 123,
         time: const TimeOfDay(hour: 14, minute: 30),
         date: DateTime(2024, 3, 15),
         location: 'Test Location',
@@ -162,7 +162,7 @@ void main() {
 
       expect(json['id'], equals(1));
       expect(json['observation_image'], equals('test_image.jpg'));
-      expect(json['related_field'], equals(123));
+      expect(json['related_plant'], equals(123));
       expect(json['time'], equals('14:30:00'));
       expect(json['date'], equals('2024-03-15'));
       expect(json['location'], equals('Test Location'));
@@ -196,7 +196,7 @@ void main() {
       final observation = Observation.fromJson(json);
 
       expect(observation.observationImage, isNull);
-      expect(observation.relatedField, isNull);
+      expect(observation.relatedPlant, isNull);
       expect(observation.createdBy, isNull);
     });
 

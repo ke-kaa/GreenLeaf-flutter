@@ -21,7 +21,7 @@ void main() {
   final testObservation = Observation(
     id: 1,
     observationImage: 'obs_image.jpg',
-    relatedField: 1,
+    relatedPlant: 1,
     time: const TimeOfDay(hour: 10, minute: 30),
     date: DateTime(2024, 1, 1),
     location: 'Test Location',
@@ -31,7 +31,7 @@ void main() {
   final testObservation2 = Observation(
     id: 2,
     observationImage: 'obs_image2.jpg',
-    relatedField: 2,
+    relatedPlant: 2,
     time: const TimeOfDay(hour: 12, minute: 0),
     date: DateTime(2024, 2, 2),
     location: 'Test Location 2',
@@ -112,7 +112,7 @@ void main() {
 
     group('addObservation', () {
       final obsData = {
-        'related_field': 1,
+        'related_plant': 1,
         'date': '2024-01-01',
         'time': '10:30',
         'location': 'Test Location',
@@ -146,7 +146,7 @@ void main() {
 
     group('updateObservation', () {
       final updateData = {
-        'related_field': 1,
+        'related_plant': 1,
         'date': '2024-01-01',
         'time': '11:00',
         'location': 'Updated Location',

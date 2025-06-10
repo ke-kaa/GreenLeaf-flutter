@@ -19,7 +19,7 @@ class ObservationAdapter extends TypeAdapter<Observation> {
     return Observation(
       id: fields[0] as int,
       observationImage: fields[1] as String?,
-      relatedField: fields[2] as int?,
+      relatedPlant: fields[2] as int?,
       time: fields[3] as TimeOfDay,
       date: fields[4] as DateTime,
       location: fields[5] as String,
@@ -38,7 +38,7 @@ class ObservationAdapter extends TypeAdapter<Observation> {
       ..writeByte(1)
       ..write(obj.observationImage)
       ..writeByte(2)
-      ..write(obj.relatedField)
+      ..write(obj.relatedPlant)
       ..writeByte(3)
       ..write(obj.time)
       ..writeByte(4)

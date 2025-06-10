@@ -111,7 +111,7 @@ class RemoteObservationRepository implements ObservationRepository {
       final tempId = DateTime.now().microsecondsSinceEpoch; // Generate a unique temporary ID
       final offlineObservation = Observation(
         id: tempId,
-        relatedField: data['related_field'] as int?, // Assuming it's an int
+        relatedPlant: data['related_plant_id'] as int?, // Changed from related_plant to related_plant_id
         date: DateTime.parse(data['date'] as String),
         time: TimeOfDay(hour: int.parse(data['time'].split(':')[0]), minute: int.parse(data['time'].split(':')[1])),
         location: data['location'] as String,
@@ -156,9 +156,9 @@ class RemoteObservationRepository implements ObservationRepository {
       print('Dio error updating observation online: ${e.message}. Attempting to update locally.');
       final existingObservation = localDataSource.getCachedObservations().firstWhere((o) => o.id == id);
       final offlineObservation = existingObservation.copyWith(
-        relatedField: data['related_field'] as int? ?? existingObservation.relatedField,
+        relatedPlant: data['related_plant_id'] as int? ?? existingObservation.relatedPlant, // Changed from related_plant to related_plant_id
         date: DateTime.parse(data['date'] as String? ?? existingObservation.date.toIso8601String()),
-        time: TimeOfDay(hour: int.parse((data['time'] as String? ?? '00:00').split(':')[0]), minute: int.parse((data['time'] as String? ?? '00:00').split(':')[1])), // Handle TimeOfDay parsing
+        time: TimeOfDay(hour: int.parse((data['time'] as String? ?? '00:00').split(':')[0]), minute: int.parse((data['time'] as String? ?? '00:00').split(':')[1])),
         location: data['location'] as String? ?? existingObservation.location,
         note: data['note'] as String? ?? existingObservation.note,
         observationImage: imagePath ?? existingObservation.observationImage,
