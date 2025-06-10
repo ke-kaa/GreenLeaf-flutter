@@ -19,7 +19,7 @@ class ObservationDetailPage extends ConsumerWidget {
 
     // Find the related plant's common name
     final relatedPlant = plantsState.plants.firstWhere(
-      (plant) => plant.id == observation.relatedField,
+      (plant) => plant.id == observation.relatedPlant,
       orElse: () => Plant(
         id: -1,
         commonName: 'Unknown Plant',

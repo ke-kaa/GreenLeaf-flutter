@@ -273,16 +273,16 @@ class _HomePageState extends ConsumerState<HomePage> {
     
     // Debug logging
     print('Debug - Observation ID: ${observation.id}');
-    print('Debug - Related Field: ${observation.relatedField} (Type: ${observation.relatedField.runtimeType})');
+    print('Debug - Related Plant: ${observation.relatedPlant} (Type: ${observation.relatedPlant.runtimeType})');
     print('Debug - Available Plants:');
     for (var plant in plantState.plants) {
       print('  - Plant ID: ${plant.id}, Name: ${plant.commonName}');
     }
     
-    // Convert relatedField to int if it's a string
-    final int? plantId = observation.relatedField is String 
-        ? int.tryParse(observation.relatedField.toString())
-        : observation.relatedField;
+    // Convert relatedPlant to int if it's a string
+    final int? plantId = observation.relatedPlant is String 
+        ? int.tryParse(observation.relatedPlant.toString())
+        : observation.relatedPlant;
     
     print('Debug - Converted Plant ID: $plantId (Type: ${plantId.runtimeType})');
     

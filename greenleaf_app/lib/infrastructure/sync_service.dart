@@ -138,7 +138,7 @@ class SyncService {
     for (final observation in observations.where((o) => o.syncStatus == SyncStatus.pending_create)) {
       try {
         final formData = FormData.fromMap({
-          'related_field': observation.relatedField,
+          'related_field': observation.relatedPlant,
           'date': observation.date.toIso8601String(),
           'time': '${observation.time.hour.toString().padLeft(2, '0')}:${observation.time.minute.toString().padLeft(2, '0')}',
           'location': observation.location,
@@ -173,7 +173,7 @@ class SyncService {
     for (final observation in observations.where((o) => o.syncStatus == SyncStatus.pending_update)) {
       try {
         final formData = FormData.fromMap({
-          'related_field': observation.relatedField,
+          'related_field': observation.relatedPlant,
           'date': observation.date.toIso8601String(),
           'time': '${observation.time.hour.toString().padLeft(2, '0')}:${observation.time.minute.toString().padLeft(2, '0')}',
           'location': observation.location,

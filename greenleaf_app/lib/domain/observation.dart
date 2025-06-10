@@ -11,7 +11,7 @@ class Observation {
   @HiveField(1)
   final String? observationImage;
   @HiveField(2)
-  final int? relatedField;
+  final int? relatedPlant;
   @HiveField(3)
   final TimeOfDay time;
   @HiveField(4)
@@ -28,7 +28,7 @@ class Observation {
   Observation({
     required this.id,
     this.observationImage,
-    this.relatedField,
+    this.relatedPlant,
     required this.time,
     required this.date,
     required this.location,
@@ -40,7 +40,7 @@ class Observation {
   Observation copyWith({
     int? id,
     String? observationImage,
-    int? relatedField,
+    int? relatedPlant,
     TimeOfDay? time,
     DateTime? date,
     String? location,
@@ -51,7 +51,7 @@ class Observation {
     return Observation(
       id: id ?? this.id,
       observationImage: observationImage ?? this.observationImage,
-      relatedField: relatedField ?? this.relatedField,
+      relatedPlant: relatedPlant ?? this.relatedPlant,
       time: time ?? this.time,
       date: date ?? this.date,
       location: location ?? this.location,
@@ -77,25 +77,32 @@ class Observation {
     if (rawObservationImage is String && rawObservationImage.isNotEmpty) {
       observationImageValue = rawObservationImage;
     }
-    // If rawObservationImage is int or null or empty string, observationImageValue remains null.
 
-    // Handle related_field parsing
-    int? relatedFieldValue;
-    final dynamic rawRelatedField = json['related_field'];
-    if (rawRelatedField != null) {
-      if (rawRelatedField is int) {
-        relatedFieldValue = rawRelatedField;
-      } else if (rawRelatedField is String) {
-        relatedFieldValue = int.tryParse(rawRelatedField);
-      } else if (rawRelatedField is double) {
-        relatedFieldValue = rawRelatedField.toInt();
+    // Handle related_plant parsing - check both related_plant and related_plant_id
+    int? relatedPlantValue;
+    final dynamic rawRelatedPlant = json['related_plant'];
+    final dynamic rawRelatedPlantId = json['related_plant_id'];
+    
+    if (rawRelatedPlantId != null) {
+      if (rawRelatedPlantId is int) {
+        relatedPlantValue = rawRelatedPlantId;
+      } else if (rawRelatedPlantId is String) {
+        relatedPlantValue = int.tryParse(rawRelatedPlantId);
+      }
+    } else if (rawRelatedPlant != null) {
+      if (rawRelatedPlant is Map && rawRelatedPlant.containsKey('id')) {
+        relatedPlantValue = rawRelatedPlant['id'] as int;
+      } else if (rawRelatedPlant is int) {
+        relatedPlantValue = rawRelatedPlant;
+      } else if (rawRelatedPlant is String) {
+        relatedPlantValue = int.tryParse(rawRelatedPlant);
       }
     }
 
     return Observation(
       id: json['id'] as int,
       observationImage: observationImageValue,
-      relatedField: relatedFieldValue,
+      relatedPlant: relatedPlantValue,
       time: TimeOfDay(hour: hour, minute: minute),
       date: () {
         String dateString = json['date'] as String;
@@ -116,7 +123,7 @@ class Observation {
   Map<String, dynamic> toJson() => {
         'id': id,
         'observation_image': observationImage,
-        'related_field': relatedField,
+        'related_plant_id': relatedPlant,
         'time': '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}:00', // Format TimeOfDay to HH:MM:SS
         'date': date.toIso8601String().split('T').first,
         'location': location,
