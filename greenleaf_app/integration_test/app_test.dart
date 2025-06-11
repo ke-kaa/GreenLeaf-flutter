@@ -10,7 +10,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:greenleaf_app/presentation/app.dart';
 import 'package:greenleaf_app/application/auth_provider.dart';
 import 'package:greenleaf_app/infrastructure/auth_repository.dart';
-import 'package:greenleaf_app/infrastructure/token_storage.dart';
 import 'test_helpers.dart';
 
 class MockTokenStorage {
@@ -83,107 +82,176 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   setUpAll(() async {
-    // Initialize Hive only once
-    final appDir = await getApplicationDocumentsDirectory();
-    await Hive.initFlutter(appDir.path);
-    
-    // Register adapters
-    Hive.registerAdapter(PlantAdapter());
-    Hive.registerAdapter(ObservationAdapter());
-    Hive.registerAdapter(TimeOfDayAdapter());
-    Hive.registerAdapter(SyncStatusAdapter());
-    
-    // Open boxes
-    await Hive.openBox('tokens');
-    await Hive.openBox<Plant>('plants');
-    await Hive.openBox<Observation>('observations');
+    try {
+      // Initialize Hive only once
+      final appDir = await getApplicationDocumentsDirectory();
+      await Hive.initFlutter(appDir.path);
+      
+      // Register adapters
+      Hive.registerAdapter(PlantAdapter());
+      Hive.registerAdapter(ObservationAdapter());
+      Hive.registerAdapter(TimeOfDayAdapter());
+      Hive.registerAdapter(SyncStatusAdapter());
+      
+      // Open boxes
+      await Hive.openBox('tokens');
+      await Hive.openBox<Plant>('plants');
+      await Hive.openBox<Observation>('observations');
+    } catch (e) {
+      print('Error in setUpAll: $e');
+      rethrow;
+    }
   });
 
   setUp(() async {
-    // Clear boxes before each test
-    await Hive.box('tokens').clear();
-    await Hive.box<Plant>('plants').clear();
-    await Hive.box<Observation>('observations').clear();
-    await MockTokenStorage.clearTokens();
+    try {
+      // Clear boxes before each test
+      await Hive.box('tokens').clear();
+      await Hive.box<Plant>('plants').clear();
+      await Hive.box<Observation>('observations').clear();
+      await MockTokenStorage.clearTokens();
+    } catch (e) {
+      print('Error in setUp: $e');
+      rethrow;
+    }
   });
 
   tearDownAll(() async {
-    // Close boxes after all tests
-    await Hive.close();
+    try {
+      await Hive.close();
+    } catch (e) {
+      print('Error in tearDownAll: $e');
+      rethrow;
+    }
   });
 
   group('End-to-end test', () {
     testWidgets('App launch and navigation test', (WidgetTester tester) async {
-      // Override the auth repository provider
-      final container = ProviderContainer(
-        overrides: [
-          authRepositoryProvider.overrideWithValue(MockAuthRepository()),
-        ],
-      );
+      try {
+        // Override the auth repository provider
+        final container = ProviderContainer(
+          overrides: [
+            authRepositoryProvider.overrideWithValue(MockAuthRepository()),
+          ],
+        );
 
-      // Initialize app with the container
-      await tester.pumpWidget(
-        UncontrolledProviderScope(
-          container: container,
-          child: const GreenLeafApp(),
-        ),
-      );
-      await tester.pumpAndSettle();
+        // Initialize app with the container
+        await tester.pumpWidget(
+          UncontrolledProviderScope(
+            container: container,
+            child: const GreenLeafApp(),
+          ),
+        );
+        await tester.pumpAndSettle();
 
-      // Initialize auth state
-      await container.read(authProvider.notifier).init();
-      await tester.pumpAndSettle();
+        // Initialize auth state
+        await container.read(authProvider.notifier).init();
+        await tester.pumpAndSettle();
 
-      // Login first
-      await TestHelpers.login(tester);
-      await tester.pumpAndSettle(const Duration(seconds: 2));
+        // Login first
+        await TestHelpers.login(tester);
+        await tester.pumpAndSettle(const Duration(seconds: 2));
 
-      // Verify bottom navigation bar is visible
-      expect(find.byType(BottomNavigationBar), findsOneWidget);
-      await tester.pumpAndSettle();
+        // Verify bottom navigation bar is visible
+        expect(find.byType(BottomNavigationBar), findsOneWidget);
+        await tester.pumpAndSettle();
 
-      // Navigate to different tabs
-      await TestHelpers.navigateToTab(tester, 1); // Profile tab
-      await tester.pumpAndSettle(const Duration(seconds: 2));
-      expect(find.byType(BottomNavigationBar), findsOneWidget);
+        // Navigate to different tabs
+        await TestHelpers.navigateToTab(tester, 1); // Profile tab
+        await tester.pumpAndSettle(const Duration(seconds: 2));
+        expect(find.byType(BottomNavigationBar), findsOneWidget);
 
-      await TestHelpers.navigateToTab(tester, 0); // Home tab
-      await tester.pumpAndSettle(const Duration(seconds: 2));
-      expect(find.byType(BottomNavigationBar), findsOneWidget);
+        await TestHelpers.navigateToTab(tester, 0); // Home tab
+        await tester.pumpAndSettle(const Duration(seconds: 2));
+        expect(find.byType(BottomNavigationBar), findsOneWidget);
+      } catch (e) {
+        print('Error in app launch test: $e');
+        rethrow;
+      }
     });
 
     testWidgets('Plant observation flow test', (WidgetTester tester) async {
-      // Override the auth repository provider
-      final container = ProviderContainer(
-        overrides: [
-          authRepositoryProvider.overrideWithValue(MockAuthRepository()),
-        ],
-      );
+      try {
+        // Override the auth repository provider
+        final container = ProviderContainer(
+          overrides: [
+            authRepositoryProvider.overrideWithValue(MockAuthRepository()),
+          ],
+        );
 
-      // Initialize app with the container
-      await tester.pumpWidget(
-        UncontrolledProviderScope(
-          container: container,
-          child: const GreenLeafApp(),
-        ),
-      );
-      await tester.pumpAndSettle();
+        // Initialize app with the container
+        await tester.pumpWidget(
+          UncontrolledProviderScope(
+            container: container,
+            child: const GreenLeafApp(),
+          ),
+        );
+        await tester.pumpAndSettle();
 
-      // Initialize auth state
-      await container.read(authProvider.notifier).init();
-      await tester.pumpAndSettle();
+        // Initialize auth state
+        await container.read(authProvider.notifier).init();
+        await tester.pumpAndSettle();
 
-      // Login first
-      await TestHelpers.login(tester);
-      await tester.pumpAndSettle(const Duration(seconds: 2));
+        // Login first
+        await TestHelpers.login(tester);
+        await tester.pumpAndSettle(const Duration(seconds: 2));
 
-      // Add a plant observation
-      await TestHelpers.addPlantObservation(tester);
-      await tester.pumpAndSettle(const Duration(seconds: 2));
+        // Add a plant observation
+        await TestHelpers.addPlantObservation(tester);
+        await tester.pumpAndSettle(const Duration(seconds: 2));
 
-      // Verify the observation was added
-      expect(find.text('Test Plant'), findsOneWidget);
-      expect(find.text('Test Observation'), findsOneWidget);
+        // Verify the observation was added
+        expect(find.text('Test Plant'), findsOneWidget);
+        expect(find.text('Test Observation'), findsOneWidget);
+      } catch (e) {
+        print('Error in plant observation test: $e');
+        rethrow;
+      }
+    });
+
+    testWidgets('Logout flow test', (WidgetTester tester) async {
+      try {
+        // Override the auth repository provider
+        final container = ProviderContainer(
+          overrides: [
+            authRepositoryProvider.overrideWithValue(MockAuthRepository()),
+          ],
+        );
+
+        // Initialize app with the container
+        await tester.pumpWidget(
+          UncontrolledProviderScope(
+            container: container,
+            child: const GreenLeafApp(),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Initialize auth state
+        await container.read(authProvider.notifier).init();
+        await tester.pumpAndSettle();
+
+        // Login first
+        await TestHelpers.login(tester);
+        await tester.pumpAndSettle(const Duration(seconds: 2));
+
+        // Navigate to profile tab
+        await TestHelpers.navigateToTab(tester, 1);
+        await tester.pumpAndSettle(const Duration(seconds: 2));
+
+        // Find and tap logout button
+        final logoutButton = find.widgetWithText(ElevatedButton, 'Log Out');
+        expect(logoutButton, findsOneWidget);
+        await tester.tap(logoutButton);
+        await tester.pumpAndSettle(const Duration(seconds: 2));
+
+        // Verify we're back at login screen
+        expect(find.widgetWithText(TextField, 'Email'), findsOneWidget);
+        expect(find.widgetWithText(TextField, 'Password'), findsOneWidget);
+      } catch (e) {
+        print('Error in logout test: $e');
+        rethrow;
+      }
     });
   });
 }

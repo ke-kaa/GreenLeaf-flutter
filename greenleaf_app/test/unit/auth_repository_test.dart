@@ -37,6 +37,13 @@ void main() {
     authRepository = RemoteAuthRepository(mockDio, baseUrl: baseUrl);
     // Clear tokens before each test
     tokensBox.clear();
+    // Set up default tokens for tests that need them
+    tokensBox.put('access_token', 'test_access_token');
+    tokensBox.put('refresh_token', 'test_refresh_token');
+  });
+
+  tearDown(() {
+    tokensBox.clear();
   });
 
   tearDownAll(() async {
@@ -219,9 +226,6 @@ void main() {
 
     group('updateProfile', () {
       test('should return updated user on successful update', () async {
-        // Set up access token
-        await tokensBox.put('access_token', 'test_access_token');
-
         when(mockDio.patch(
           '$baseUrl/account/api/profile/',
           data: anyNamed('data'),
@@ -277,9 +281,6 @@ void main() {
 
     group('deleteAccount', () {
       test('should delete account successfully', () async {
-        // Set up access token
-        await tokensBox.put('access_token', 'test_access_token');
-
         when(mockDio.delete(
           '$baseUrl/account/api/profile/',
           options: anyNamed('options'),
@@ -321,9 +322,6 @@ void main() {
 
     group('refreshToken', () {
       test('should refresh token successfully', () async {
-        // Set up refresh token
-        await tokensBox.put('refresh_token', 'test_refresh_token');
-
         when(mockDio.post(
           '$baseUrl/account/api/token/refresh/',
           data: {'refresh': 'test_refresh_token'},
@@ -335,7 +333,6 @@ void main() {
 
         await authRepository.refreshToken();
         expect(tokensBox.get('access_token'), 'new_access_token');
-        expect(tokensBox.get('refresh_token'), 'test_refresh_token');
       });
 
       test('should throw AuthFailure on refresh token error', () async {

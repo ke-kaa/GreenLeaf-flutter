@@ -19,7 +19,6 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   late TextEditingController phoneController;
 
   String? _selectedGender;
-
   bool isEditing = false;
   bool showDeleteDialog = false;
   File? _selectedImage;
@@ -85,20 +84,26 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
     final user = authState.user;
+
     if (authState.isLoading) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
       );
     }
+
+    if (user == null) {
+      return const Scaffold(
+        body: Center(child: Text('No user data')),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
         backgroundColor: Colors.green,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context); // Go back to the previous screen
-          },
+          onPressed: () => Navigator.pop(context),
         ),
         actions: [
           if (!isEditing)
@@ -113,148 +118,152 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             ),
         ],
       ),
-      body: user == null
-          ? const Center(child: Text('No user data'))
-          : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Form(
-                key: _formKey,
-                child: ListView(
-                  children: [
-                    const SizedBox(height: 16),
-                    Stack(
-                      alignment: Alignment.bottomRight,
-                      children: [
-                        CircleAvatar(
-                          radius: 48,
-                          backgroundImage: _selectedImage != null
-                              ? FileImage(_selectedImage!)
-                              : (user.profileImage != null && user.profileImage!.isNotEmpty
-                                  ? NetworkImage(user.profileImage!) as ImageProvider
-                                  : null),
-                          child: (user.profileImage == null || user.profileImage!.isEmpty) && _selectedImage == null
-                              ? const Icon(Icons.person, size: 48)
-                              : null,
-                        ),
-                        if (isEditing)
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: InkWell(
-                              onTap: _pickImage,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.green,
-                                  shape: BoxShape.circle,
-                                ),
-                                padding: const EdgeInsets.all(8),
-                                child: const Icon(Icons.camera_alt, color: Colors.white, size: 20),
-                              ),
-                            ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: [
+              const SizedBox(height: 16),
+              Stack(
+                alignment: Alignment.bottomRight,
+                children: [
+                  CircleAvatar(
+                    radius: 48,
+                    backgroundImage: _selectedImage != null
+                        ? FileImage(_selectedImage!)
+                        : (user.profileImage != null && user.profileImage!.isNotEmpty
+                            ? NetworkImage(user.profileImage!) as ImageProvider
+                            : null),
+                    child: (user.profileImage == null || user.profileImage!.isEmpty) && _selectedImage == null
+                        ? const Icon(Icons.person, size: 48)
+                        : null,
+                  ),
+                  if (isEditing)
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: InkWell(
+                        onTap: _pickImage,
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.green,
+                            shape: BoxShape.circle,
                           ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    TextFormField(
-                      controller: firstNameController,
-                      enabled: isEditing,
-                      decoration: const InputDecoration(labelText: 'First Name'),
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: lastNameController,
-                      enabled: isEditing,
-                      decoration: const InputDecoration(labelText: 'Last Name'),
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: birthdateController,
-                      enabled: isEditing,
-                      decoration: const InputDecoration(labelText: 'Birth Date (YYYY-MM-DD)'),
-                    ),
-                    const SizedBox(height: 12),
-                    // Dropdown for Gender
-                    IgnorePointer(
-                      ignoring: !isEditing,
-                      child: DropdownButtonFormField<String>(
-                        value: _selectedGender,
-                        decoration: const InputDecoration(labelText: 'Gender'),
-                        items: const [
-                          DropdownMenuItem(value: 'Male', child: Text('Male')),
-                          DropdownMenuItem(value: 'Female', child: Text('Female')),
-                        ],
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            _selectedGender = newValue;
-                          });
-                        },
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please select your gender';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      controller: phoneController,
-                      enabled: isEditing,
-                      decoration: const InputDecoration(labelText: 'Mobile'),
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      initialValue: user.email,
-                      enabled: false,
-                      decoration: const InputDecoration(labelText: 'Email'),
-                    ),
-                    const SizedBox(height: 24),
-                    if (!isEditing)
-                      ElevatedButton(
-                        onPressed: _onLogout,
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                        child: const Text('Log Out'),
-                      ),
-                    if (!isEditing)
-                      const SizedBox(height: 12),
-                    if (!isEditing)
-                      ElevatedButton(
-                        onPressed: () => setState(() => showDeleteDialog = true),
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                        child: const Text('Delete Account'),
-                      ),
-                    if (authState.failure != null)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 12.0),
-                        child: Text(
-                          authState.failure!.message,
-                          style: const TextStyle(color: Colors.red),
+                          padding: const EdgeInsets.all(8),
+                          child: const Icon(Icons.camera_alt, color: Colors.white, size: 20),
                         ),
                       ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              TextFormField(
+                controller: firstNameController,
+                enabled: isEditing,
+                decoration: const InputDecoration(labelText: 'First Name'),
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: lastNameController,
+                enabled: isEditing,
+                decoration: const InputDecoration(labelText: 'Last Name'),
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: birthdateController,
+                enabled: isEditing,
+                decoration: const InputDecoration(labelText: 'Birth Date (YYYY-MM-DD)'),
+              ),
+              const SizedBox(height: 12),
+              IgnorePointer(
+                ignoring: !isEditing,
+                child: DropdownButtonFormField<String>(
+                  value: _selectedGender,
+                  decoration: const InputDecoration(labelText: 'Gender'),
+                  items: const [
+                    DropdownMenuItem(value: 'Male', child: Text('Male')),
+                    DropdownMenuItem(value: 'Female', child: Text('Female')),
                   ],
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      _selectedGender = newValue;
+                    });
+                  },
                 ),
               ),
-            ),
-      // Delete confirmation dialog
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: phoneController,
+                enabled: isEditing,
+                decoration: const InputDecoration(labelText: 'Mobile'),
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                initialValue: user.email,
+                enabled: false,
+                decoration: const InputDecoration(labelText: 'Email'),
+              ),
+              const SizedBox(height: 24),
+              if (!isEditing) ...[
+                ElevatedButton(
+                  onPressed: _onLogout,
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                  child: const Text('Log Out'),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: () => setState(() => showDeleteDialog = true),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                  child: const Text('Delete Account'),
+                ),
+              ],
+              if (authState.failure != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 12.0),
+                  child: Text(
+                    authState.failure!.message,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
       floatingActionButton: showDeleteDialog
           ? FloatingActionButton.extended(
               onPressed: () => setState(() => showDeleteDialog = false),
-              label: AlertDialog(
-                title: const Text('Delete Account'),
-                content: const Text('Are you sure you want to delete your account? This action cannot be undone.'),
-                actions: [
-                  TextButton(
-                    onPressed: () => setState(() => showDeleteDialog = false),
-                    child: const Text('Cancel'),
-                  ),
-                  TextButton(
-                    onPressed: _onDeleteAccount,
-                    child: const Text('Delete', style: TextStyle(color: Colors.red)),
-                  ),
-                ],
-              ),
+              label: const Text('Cancel'),
+              icon: const Icon(Icons.close),
             )
           : null,
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (showDeleteDialog) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Delete Account'),
+          content: const Text('Are you sure you want to delete your account? This action cannot be undone.'),
+          actions: [
+            TextButton(
+              onPressed: () => setState(() => showDeleteDialog = false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() => showDeleteDialog = false);
+                _onDeleteAccount();
+              },
+              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        ),
+      );
+    }
   }
 } 
